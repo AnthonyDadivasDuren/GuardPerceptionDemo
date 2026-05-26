@@ -230,7 +230,7 @@ It also changes the guard's movement speed and triggers the visual color feedbac
 
 ## Visual Feedback
 
-There is also a optional debug mode where the guard changes color depending on its current state.
+There is also a optional debug mode where the guard changes color depending on its current state altough without animations.
 
 | State | Meaning | Color |
 |---|---|---|
