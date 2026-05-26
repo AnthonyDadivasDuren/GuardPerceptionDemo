@@ -104,3 +104,175 @@ Root
         ├── Set Next Patrol Point
         ├── Move To: PatrolLocation
         └── Wait
+```
+
+The Selector checks the branches from left to right.
+
+The priority is:
+
+```text
+Chase > Investigate > Patrol
+```
+
+This means the guard will chase first if the player is visible.  
+If the player is not visible anymore but there is a last known location, the guard investigates.  
+If neither of those are true, the guard goes back to patrolling.
+
+---
+
+## Blackboard Keys
+
+The guard uses `BB_Guard`.
+
+| Key | Type | Purpose |
+|---|---|---|
+| `TargetActor` | Object / Actor | Stores the player when the guard can currently see them. This is used by the chase branch. |
+| `LastKnownLocation` | Vector | Stores where the player was last seen or where the guard thinks the player was moving. This is used by the investigate branch. |
+| `PatrolLocation` | Vector | Stores the current patrol destination. This is used by the patrol branch. |
+
+---
+
+## AI Perception
+
+The guard uses one AI Perception sense for the G version:
+
+```text
+Sight
+```
+
+The Sight sense is set up on `BP_GuardAIController`.
+
+When the guard sees the player, the AI Controller sets:
+
+```text
+TargetActor = Player
+```
+
+This makes the Behaviour Tree switch to the chase branch.
+
+When the guard loses sight of the player, the AI Controller clears:
+
+```text
+TargetActor
+```
+
+The guard then stops chasing. Since `LastKnownLocation` is still set by the Behaviour Tree service, the Behaviour Tree switches to the investigate branch instead.
+
+I chose Sight because it fits the stealth facility idea well. It also makes the AI state changes easy to show in the video.
+
+---
+
+## Last Known Location
+
+At first I only updated `LastKnownLocation` when the player was first detected, but that made the guard sometimes investigate the wrong place.
+
+To fix this, I added a Behaviour Tree service called:
+
+```text
+BTService_UpdateLastKnownLocation
+```
+
+This service runs while the guard is chasing. It keeps updating `LastKnownLocation` based on the player position and movement direction.
+
+The guard does not only investigate the exact position where the player was last visible. It investigates a bit further in the direction the player was moving. This makes the guard feel less like it instantly gives up when the player hides behind a wall.
+
+The basic idea is:
+
+```text
+LastKnownLocation = PlayerLocation + PlayerVelocityDirection * InvestigationOffset
+```
+
+If the player is not moving much, it just uses the player's current location instead.
+
+---
+
+## Custom C++ Behaviour Tree Tasks
+
+Some of the Behaviour Tree nodes are custom C++ tasks.
+
+### `BTTask_SetNextPatrolPoint`
+
+This task gets the next patrol point from the guard's patrol point array and writes the location to the Blackboard key:
+
+```text
+PatrolLocation
+```
+
+The normal Unreal `Move To` node then moves the guard to that location.
+
+### `BTTask_ClearBlackBoardKey`
+
+This task clears a selected Blackboard key.
+
+In this project it is used to clear:
+
+```text
+LastKnownLocation
+```
+
+after the guard has finished investigating. This allows the AI to leave the investigate branch and return to patrol.
+
+### `BTTask_SetGuardState`
+
+This task changes the guard's current state.
+
+The states are:
+
+```text
+Patrol
+Chase
+Investigate
+```
+
+It also changes the guard's movement speed and triggers the visual color feedback.
+
+---
+
+## Visual Feedback
+
+The guard changes color depending on its current state.
+
+| State | Meaning |
+|---|---|
+| Patrol | The guard is following patrol points | Blue
+| Chase | The guard has seen the player and is chasing | Red
+| Investigate | The guard lost sight and is checking the last known location | Yellow
+
+This is mostly used for debugging and to make the behaviour easier to see.
+
+---
+
+## Movement Speeds
+
+The guard also changes movement speed depending on state.
+
+- Patrol is slower.
+- Chase is faster.
+- Investigate is in between.
+
+This makes the AI behaviour easier to read and makes the guard feel less static.
+
+---
+
+## Caught / Restart Logic
+
+The guard has a catch trigger.
+
+If the guard reaches the player while chasing, the player is caught and the level restarts. This gives the demo a simple fail condition and makes it feel more like a small stealth game.
+
+---
+
+## Video Demonstration
+
+The submitted video should show:
+
+- The NavMesh in the level
+- The player-controlled character
+- The guard patrolling between patrol points
+- The guard detecting the player with Sight
+- The guard switching to chase
+- The player breaking line of sight
+- The guard investigating the predicted last known location
+- The guard returning to patrol
+- The guard color changes for different states
+- The caught/restart logic
