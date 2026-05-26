@@ -73,6 +73,7 @@ This happens when the guard loses sight of the player.
 While chasing, a Behaviour Tree service updates `LastKnownLocation`.  
 When the player leaves sight, `TargetActor` is cleared, but `LastKnownLocation` stays set.  
 The guard then moves to that location, waits shortly, clears the key, and goes back to patrol.
+The investigation point is slightly predicted in the direction the player was moving, so the guard searches a bit further instead of only walking to the exact last visible position.
 
 ---
 
