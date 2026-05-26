@@ -232,7 +232,7 @@ It also changes the guard's movement speed and triggers the visual color feedbac
 
 The guard changes color depending on its current state.
 
-| State | Meaning |
+| State | Meaning | Color |
 |---|---|
 | Patrol | The guard is following patrol points | Blue |
 | Chase | The guard has seen the player and is chasing | Red |
