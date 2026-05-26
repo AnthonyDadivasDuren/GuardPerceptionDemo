@@ -24,4 +24,13 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "AI|State")
 	void OnGuardStateChanged(EGuardState NewState);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
+	float PatrolSpeed = 180.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
+	float InvestigateSpeed = 280.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
+	float ChaseSpeed = 450.0f;
 };
