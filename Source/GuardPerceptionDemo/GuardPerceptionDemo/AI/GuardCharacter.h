@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GuardState.h"
 #include "GuardCharacter.generated.h"
 
 UCLASS()
@@ -17,4 +18,10 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="AI|Patrol")
 	int32 CurrentPatrolIndex = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI|Patrol")
+	EGuardState CurrentState = EGuardState::Patrol;
+	
+	UFUNCTION(BlueprintImplementableEvent, Category = "AI|State")
+	void OnGuardStateChanged(EGuardState NewState);
 };
