@@ -230,7 +230,7 @@ It also changes the guard's movement speed and triggers the visual color feedbac
 
 ## Visual Feedback
 
-The guard changes color depending on its current state.
+There is also a optional debug mode where the guard changes color depending on its current state altough without animations.
 
 | State | Meaning | Color |
 |---|---|---|
@@ -239,6 +239,16 @@ The guard changes color depending on its current state.
 | Investigate | The guard lost sight and is checking the last known location | Yellow |
 
 This is mostly used for debugging and to make the behaviour easier to see.
+--
+
+## Guard Animations
+
+The guard uses retargeted animations for the main AI states.
+
+- Patrol uses a walk animation.
+- Chase uses a sprint animation.
+- Investigate uses walking while moving to the last known location.
+- When the guard reaches the investigation point and stops, it plays a look-around animation.
 
 ---
 
