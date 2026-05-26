@@ -230,7 +230,7 @@ It also changes the guard's movement speed and triggers the visual color feedbac
 
 ## Visual Feedback
 
-There is also a optional debug mode where the guard changes color depending on its current state altough without animations.
+There is also an optional debug mode where the guard changes color depending on its current state. altough without animations.
 
 | State | Meaning | Color |
 |---|---|---|
@@ -239,7 +239,7 @@ There is also a optional debug mode where the guard changes color depending on i
 | Investigate | The guard lost sight and is checking the last known location | Yellow |
 
 This is mostly used for debugging and to make the behaviour easier to see.
---
+---
 
 ## Guard Animations
 
@@ -272,6 +272,16 @@ If the guard reaches the player while chasing, the player is caught and the leve
 
 ---
 
+## Git LFS
+
+Git LFS is enabled for Unreal Engine assets such as:
+
+```text
+.uasset
+.fbx
+.mp4
+```
+
 ## Video Demonstration
 
 The submitted video should show:
@@ -284,5 +294,3 @@ The submitted video should show:
 - The player breaking line of sight
 - The guard investigating the predicted last known location
 - The guard returning to patrol
-- The guard color changes for different states
-- The caught/restart logic
