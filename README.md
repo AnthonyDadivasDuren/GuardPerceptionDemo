@@ -234,9 +234,9 @@ The guard changes color depending on its current state.
 
 | State | Meaning |
 |---|---|
-| Patrol | The guard is following patrol points | Blue
-| Chase | The guard has seen the player and is chasing | Red
-| Investigate | The guard lost sight and is checking the last known location | Yellow
+| Patrol | The guard is following patrol points | Blue |
+| Chase | The guard has seen the player and is chasing | Red |
+| Investigate | The guard lost sight and is checking the last known location | Yellow |
 
 This is mostly used for debugging and to make the behaviour easier to see.
 
