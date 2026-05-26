@@ -1,9 +1,8 @@
 #include "BTTask_SetNextPatrolPoint.h"
 
 #include "AIController.h"
-#include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "GameFramework/Actor.h"
+#include "GuardCharacter.h"
 
 UBTTask_SetNextPatrolPoint::UBTTask_SetNextPatrolPoint()
 {
@@ -15,12 +14,14 @@ EBTNodeResult::Type UBTTask_SetNextPatrolPoint::ExecuteTask(UBehaviorTreeCompone
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SetNextPatrolPoint failed: No AIController"));
 		return EBTNodeResult::Failed;
 	}
 	
-	APawn* ControlledPawn = AIController->GetPawn();
-	if (!ControlledPawn)
+	AGuardCharacter* GuardCharacter = Cast<AGuardCharacter>(AIController->GetPawn());
+	if (!GuardCharacter)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SetNextPatrolPoint failed: Pawn is not AGuardCharacter"));
 		return EBTNodeResult::Failed;
 	}
 	
@@ -28,34 +29,46 @@ EBTNodeResult::Type UBTTask_SetNextPatrolPoint::ExecuteTask(UBehaviorTreeCompone
 	
 	if (!BlackboardComponent)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("SetNextPatrolPoint failed: No BlackboardComponent"));
 			return EBTNodeResult::Failed;
 		}
-		
-		
-		const FVector Origin = ControlledPawn->GetActorLocation();
-		const float PatrolRadius = 800.0f;
-		
-		UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(ControlledPawn->GetWorld());
-		
-		if (!NavSystem)
-		{
-			return EBTNodeResult::Failed;
-		}
-		
-		FNavLocation RandomLocation;
-		const bool bFoundLocation = NavSystem->GetRandomReachablePointInRadius(
-			Origin,
-			PatrolRadius,
-			RandomLocation
-		);
-		
-	if (!bFoundLocation)
+	
+	if (GuardCharacter->PatrolPoints.Num() == 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SetNextPatrolPoint failed: PatrolPoints array is empty"));
 		return EBTNodeResult::Failed;
 	}
-		
-	BlackboardComponent->SetValueAsVector(PatrolLocationKeyName, RandomLocation.Location);
-		
-	return EBTNodeResult::Succeeded;
 	
+	if (!GuardCharacter->PatrolPoints.IsValidIndex(GuardCharacter->CurrentPatrolIndex))
+	{
+		GuardCharacter->CurrentPatrolIndex = 0;
+	}
+
+	AActor* PatrolPoint = GuardCharacter->PatrolPoints[GuardCharacter->CurrentPatrolIndex];
+	if (!PatrolPoint)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetNextPatrolPoint failed: PatrolPoint is null"));
+		return EBTNodeResult::Failed;
+	}
+	
+	const FVector PatrolLocation = PatrolPoint->GetActorLocation();
+
+	BlackboardComponent->SetValueAsVector(PatrolLocationKeyName, PatrolLocation);
+
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("SetNextPatrolPoint succeeded: %s at %s"),
+		*PatrolPoint->GetName(),
+		*PatrolLocation.ToString()
+	);
+	
+	GuardCharacter->CurrentPatrolIndex++;
+	
+	if (GuardCharacter->CurrentPatrolIndex >= GuardCharacter->PatrolPoints.Num())
+	{
+		GuardCharacter->CurrentPatrolIndex = 0;
+	}
+	
+	return EBTNodeResult::Succeeded;
 }
